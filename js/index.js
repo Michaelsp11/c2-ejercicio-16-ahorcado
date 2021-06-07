@@ -18,7 +18,9 @@ const letrasElemento = document.querySelector(".letras");
 const letraDummy = letrasElemento.querySelector(".letra-dummy");
 const elementoFormularioLetras = document.querySelector(".formulario-letras");
 const elementoMensajeError = document.querySelector(".mensaje");
+const btnEnviarLetra = elementoFormularioLetras.querySelector(".btn-enviar");
 const hangman = document.querySelector("#hangman");
+const partesMunyeco = hangman.querySelectorAll(".stage");
 const llamarAPI = () => {
     fetch(`${jsonServer}${apartado}`)
         .then((response) => response.json())
@@ -40,6 +42,7 @@ const pintarPalabraInvisible = (palabraAleatoria) => {
         textoLetraNueva.textContent = letrasPalabra[indice];
         letrasElemento.append(letraNueva);
     }
+    letraDummy.remove();
 };
 elementoFormularioLetras.addEventListener("submit", (evento) => {
     evento.preventDefault();
@@ -48,7 +51,18 @@ elementoFormularioLetras.addEventListener("submit", (evento) => {
         elementoMensajeError.textContent = "Solamente se puede enviar una letra!";
     } else {
         elementoMensajeError.textContent = "";
-        contieneLetra(inputLetra.value);
+        if (!contieneLetra(inputLetra.value)) {
+            if (!pintarMunyeco()) {
+                elementoMensajeError.textContent = "Final de la partida, has perdido.";
+                inputLetra.disabled = true;
+                btnEnviarLetra.disabled = true;
+            }
+        } else if (noHayMasLetras()) {
+            elementoMensajeError.classList.add("win");
+            elementoMensajeError.textContent = "Final de la partida, has ganado.";
+            inputLetra.disabled = true;
+            btnEnviarLetra.disabled = true;
+        }
     }
     inputLetra.value = "";
 });
@@ -59,7 +73,23 @@ const comprobarLetra = (valor) => {
     }
     return false;
 };
+const noHayMasLetras = () => {
+    let noHayMas = true;
+    let contador = 0;
+    for (const elementoLetra of letrasElemento.querySelectorAll(".letra")) {
+        const elementoTextoLetra = elementoLetra.querySelector(".texto");
+        if (elementoTextoLetra.classList.contains("transparente")) {
+            if (contador < letrasElemento.querySelectorAll(".letra").length - 1) {
+                noHayMas = false;
+                break;
+            }
+        }
+        contador++;
+    }
+    return noHayMas;
+};
 const contieneLetra = (letra) => {
+    let contiene = false;
     letra = letra.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     for (const elementoLetra of letrasElemento.querySelectorAll(".letra")) {
         const elementoTextoLetra = elementoLetra.querySelector(".texto");
@@ -68,7 +98,24 @@ const contieneLetra = (letra) => {
             .replace(/[\u0300-\u036f]/g, "");
         if (elementoTextoLetra.textContent.toLowerCase() === letra.toLowerCase()) {
             elementoTextoLetra.classList.remove("transparente");
+            contiene = true;
         }
     }
+    return contiene;
+};
+const pintarMunyeco = () => {
+    let munyecoVive = false;
+    let contador = 0;
+    for (const parteMunyeco of partesMunyeco) {
+        if (parteMunyeco.classList.contains("d-none")) {
+            parteMunyeco.classList.remove("d-none");
+            if (contador < partesMunyeco.length - 1) {
+                munyecoVive = true;
+                break;
+            }
+        }
+        contador++;
+    }
+    return munyecoVive;
 };
 llamarAPI();

@@ -28,3 +28,7 @@ svg>* {
 .mensaje {
     color: #b11;
 }
+
+.mensaje.win {
+    color: rgb(25, 221, 25);
+}

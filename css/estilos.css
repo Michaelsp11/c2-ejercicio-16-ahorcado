@@ -1,0 +1,26 @@
+svg.hangman {
+    width: 18.75rem;
+    height: 18.75rem;
+}
+
+svg>* {
+    stroke: #6599aa;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-miterlimit: 10;
+    transition: 0.25s;
+}
+
+.letra {
+    border-bottom: 1px solid black;
+    margin-bottom: 20px;
+    margin-right: 20px;
+}
+
+.texto.transparente {
+    color: transparent;
+}
+
+.letra-dummy {
+    display: none;
+}

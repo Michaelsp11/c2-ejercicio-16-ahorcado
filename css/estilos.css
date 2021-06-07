@@ -24,3 +24,7 @@ svg>* {
 .letra-dummy {
     display: none;
 }
+
+.mensaje {
+    color: #b11;
+}

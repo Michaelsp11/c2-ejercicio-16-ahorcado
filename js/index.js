@@ -17,8 +17,8 @@ const apartado = "palabras";
 const letrasElemento = document.querySelector(".letras");
 const letraDummy = letrasElemento.querySelector(".letra-dummy");
 const elementoFormularioLetras = document.querySelector(".formulario-letras");
-const inputLetra = elementoFormularioLetras.querySelector(".letra-escrita");
-const btnEnviarLetra = elementoFormularioLetras.querySelector(".btn-enviar");
+const elementoMensajeError = document.querySelector(".mensaje");
+const hangman = document.querySelector("#hangman");
 const llamarAPI = () => {
     fetch(`${jsonServer}${apartado}`)
         .then((response) => response.json())
@@ -32,12 +32,43 @@ const generarPalabraAleatoria = (objetoLista) => {
 };
 const pintarPalabraInvisible = (palabraAleatoria) => {
     const letrasPalabra = palabraAleatoria.split("");
-    for (const letra of letrasPalabra) {
+    for (const indice in letrasPalabra) {
         const letraNueva = letraDummy.cloneNode(true);
         letraNueva.classList.remove("letra-dummy");
+        letraNueva.dataset.position = +indice + 1;
         const textoLetraNueva = letraNueva.querySelector(".texto");
-        textoLetraNueva.textContent = letra;
+        textoLetraNueva.textContent = letrasPalabra[indice];
         letrasElemento.append(letraNueva);
+    }
+};
+elementoFormularioLetras.addEventListener("submit", (evento) => {
+    evento.preventDefault();
+    const inputLetra = elementoFormularioLetras.querySelector(".letra-escrita");
+    if (!comprobarLetra(inputLetra.value)) {
+        elementoMensajeError.textContent = "Solamente se puede enviar una letra!";
+    } else {
+        elementoMensajeError.textContent = "";
+        contieneLetra(inputLetra.value);
+    }
+    inputLetra.value = "";
+});
+const comprobarLetra = (valor) => {
+    valor = valor.replace(/[.,:;()_?¿!¡-\s]/g);
+    if (valor.length > 0 && valor.length < 2 && isNaN(valor)) {
+        return true;
+    }
+    return false;
+};
+const contieneLetra = (letra) => {
+    letra = letra.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    for (const elementoLetra of letrasElemento.querySelectorAll(".letra")) {
+        const elementoTextoLetra = elementoLetra.querySelector(".texto");
+        elementoTextoLetra.textContent = elementoTextoLetra.textContent
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "");
+        if (elementoTextoLetra.textContent.toLowerCase() === letra.toLowerCase()) {
+            elementoTextoLetra.classList.remove("transparente");
+        }
     }
 };
 llamarAPI();
